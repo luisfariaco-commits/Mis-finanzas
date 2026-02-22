@@ -2,41 +2,333 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Elite Finance v7.1 | Fix Navegación</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Elite Finance Pro | Sistema Patrimonial</title>
+    
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/2489/2489756.png">
+    
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
     <style>
-        .active-tab { border-bottom: 4px solid #4f46e5; color: #4f46e5; font-weight: 900; }
-        .hidden { display: none; }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap');
+        body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .active-nav { border-bottom: 4px solid #4f46e5; color: #4f46e5; font-weight: 800; }
         details > summary { list-style: none; }
         details > summary::-webkit-details-marker { display: none; }
+        .glass { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); }
     </style>
 </head>
-<body class="bg-slate-50 font-sans text-slate-900 min-h-screen">
+<body class="bg-slate-50 min-h-screen pb-20">
 
-    <header class="bg-slate-900 text-white shadow-xl sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
-            <div>
-                <h1 class="text-xl font-black text-indigo-400 italic">ELITE FINANCE SYSTEM</h1>
-                <p class="text-[9px] uppercase tracking-widest text-slate-500 font-bold">Auditoría Total v7.1</p>
+    <header class="bg-slate-900 text-white sticky top-0 z-50 shadow-2xl">
+        <div class="max-w-7xl mx-auto px-4 py-4">
+            <div class="flex justify-between items-center mb-4">
+                <div>
+                    <h1 class="text-lg font-black tracking-tighter text-indigo-400">ELITE FINANCE SYSTEM</h1>
+                    <p class="text-[8px] uppercase tracking-[0.2em] text-slate-400">Control de Activos y Flujo de Caja</p>
+                </div>
+                <button onclick="exportarDatos()" class="bg-white/10 p-2 rounded-lg text-xs hover:bg-white/20 transition">
+                    <i class="fas fa-file-export"></i>
+                </button>
             </div>
-            <div class="flex gap-2 sm:gap-4">
-                <button onclick="switchTab('main')" id="btn-main" class="text-[10px] sm:text-xs font-bold uppercase p-2 active-tab">Dashboard</button>
-                <button onclick="switchTab('registro')" id="btn-registro" class="text-[10px] sm:text-xs font-bold uppercase p-2">Registrar</button>
-                <button onclick="switchTab('activos')" id="btn-activos" class="text-[10px] sm:text-xs font-bold uppercase p-2">Patrimonio</button>
+            
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
+                <div class="bg-white/5 p-3 rounded-xl border border-white/10">
+                    <p class="text-[8px] font-bold text-slate-400 uppercase">Patrimonio Neto</p>
+                    <p id="total-patrimonio" class="text-lg font-black text-indigo-300">$0.00</p>
+                </div>
+                <div class="bg-white/5 p-3 rounded-xl border border-white/10">
+                    <p class="text-[8px] font-bold text-slate-400 uppercase">Ingresos Mes</p>
+                    <p id="total-ingresos" class="text-lg font-black text-emerald-400">$0.00</p>
+                </div>
+                <div class="bg-white/5 p-3 rounded-xl border border-white/10">
+                    <p class="text-[8px] font-bold text-slate-400 uppercase">Gastos Mes</p>
+                    <p id="total-gastos" class="text-lg font-black text-red-400">$0.00</p>
+                </div>
+                <div class="bg-white/5 p-3 rounded-xl border border-white/10">
+                    <p class="text-[8px] font-bold text-slate-400 uppercase">Deuda Total</p>
+                    <p id="total-deuda" class="text-lg font-black text-amber-400">$0.00</p>
+                </div>
             </div>
         </div>
+
+        <nav class="bg-white flex justify-around border-b border-slate-200">
+            <button onclick="showTab('tab-dash')" id="nav-tab-dash" class="py-3 px-4 text-[10px] font-bold uppercase tracking-widest text-slate-400 active-nav">Dashboard</button>
+            <button onclick="showTab('tab-reg')" id="nav-tab-reg" class="py-3 px-4 text-[10px] font-bold uppercase tracking-widest text-slate-400">Registrar</button>
+            <button onclick="showTab('tab-act')" id="nav-tab-act" class="py-3 px-4 text-[10px] font-bold uppercase tracking-widest text-slate-400">Activos</button>
+            <button onclick="showTab('tab-conf')" id="nav-tab-conf" class="py-3 px-4 text-[10px] font-bold uppercase tracking-widest text-slate-400">Categorías</button>
+        </nav>
     </header>
 
-    <main class="max-w-7xl mx-auto p-4 lg:p-6">
+    <main class="max-w-7xl mx-auto p-4">
 
-        <div id="tab-main" class="tab-content space-y-8">
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div class="bg-white p-4 rounded-2xl shadow-sm border-t-4 border-indigo-500">
-                    <p class="text-[9px] font-bold text-slate-400 uppercase mb-1">Patrimonio Neto</p>
-                    <p id="dash-neto" class="text-lg sm:text-2xl font-black">$0.00</p>
+        <div id="tab-dash" class="tab-content active space-y-6">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div class="space-y-4">
+                    <h3 class="text-xs font-black text-slate-400 uppercase tracking-widest px-2">Análisis de Gastos (Flujo de Caja)</h3>
+                    <div id="container-gastos" class="space-y-2"></div>
                 </div>
-                <div class="bg-white p-4 rounded-2xl shadow-sm border-t-4 border-emerald-500">
-                    <p class="text-[9px] font-bold text-slate-400 uppercase
+                <div class="space-y-4">
+                    <h3 class="text-xs font-black text-slate-400 uppercase tracking-widest px-2">Análisis de Ingresos</h3>
+                    <div id="container-ingresos" class="space-y-2"></div>
+                    
+                    <div class="bg-slate-900 text-white p-6 rounded-3xl shadow-xl mt-6">
+                        <div class="flex justify-between items-center mb-4">
+                            <span class="text-xs font-bold text-indigo-300 uppercase">Flujo de Caja Neto</span>
+                            <span id="flujo-neto-badge" class="px-3 py-1 bg-indigo-500 rounded-full text-[10px] font-black">MES ACTUAL</span>
+                        </div>
+                        <p id="val-flujo-neto" class="text-4xl font-black">$0.00</p>
+                        <p class="text-[10px] text-slate-400 mt-2 italic">Ingresos operacionales menos gastos totales.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="tab-reg" class="tab-content max-w-xl mx-auto">
+            <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-200">
+                <h2 class="text-sm font-black text-slate-800 mb-6 uppercase">Nuevo Movimiento Diario</h2>
+                <form id="form-registro" class="space-y-4">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="space-y-1">
+                            <label class="text-[10px] font-bold text-slate-400 uppercase">Fecha</label>
+                            <input type="date" id="reg-fecha" class="w-full p-3 bg-slate-50 border rounded-xl outline-none text-sm" required>
+                        </div>
+                        <div class="space-y-1">
+                            <label class="text-[10px] font-bold text-slate-400 uppercase">Monto ($)</label>
+                            <input type="number" id="reg-monto" step="0.01" class="w-full p-3 bg-slate-50 border rounded-xl outline-none font-black text-indigo-600" placeholder="0.00" required>
+                        </div>
+                    </div>
+                    <div class="space-y-1">
+                        <label class="text-[10px] font-bold text-slate-400 uppercase">Categoría</label>
+                        <select id="reg-cat" class="w-full p-3 bg-slate-50 border rounded-xl outline-none text-sm font-bold" required></select>
+                    </div>
+                    <div class="space-y-1">
+                        <label class="text-[10px] font-bold text-slate-400 uppercase">Nota / Comentario</label>
+                        <input type="text" id="reg-nota" class="w-full p-3 bg-slate-50 border rounded-xl outline-none text-sm" placeholder="Ej: Pago de servicios públicos...">
+                    </div>
+                    <button type="submit" class="w-full bg-indigo-600 text-white font-black py-4 rounded-2xl shadow-lg shadow-indigo-100 hover:bg-indigo-700 transition uppercase tracking-tighter">Procesar Registro</button>
+                </form>
+            </div>
+        </div>
+
+        <div id="tab-act" class="tab-content space-y-6">
+            <h2 class="text-xs font-black text-slate-400 uppercase tracking-widest text-center">Planilla de Activos y Deudas Fijas</h2>
+            <div id="container-activos" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+            <div class="flex justify-center">
+                <button onclick="agregarActivo()" class="bg-slate-900 text-white px-8 py-3 rounded-xl text-[10px] font-black uppercase hover:bg-indigo-600 transition">+ Añadir Nuevo Activo</button>
+            </div>
+        </div>
+
+        <div id="tab-conf" class="tab-content max-w-2xl mx-auto">
+            <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm">
+                <h2 class="text-sm font-black text-slate-800 mb-6 uppercase">Personalizar Categorías</h2>
+                <div class="flex gap-2 mb-6">
+                    <input type="text" id="nueva-cat-nombre" placeholder="Nombre..." class="flex-grow p-3 bg-slate-50 border rounded-xl outline-none text-sm">
+                    <select id="nueva-cat-padre" class="p-3 bg-slate-50 border rounded-xl outline-none text-sm font-bold">
+                        <option value="INGRESOS">INGRESOS</option>
+                        <option value="GASTOS">GASTOS</option>
+                    </select>
+                    <button onclick="crearCategoria()" class="bg-indigo-600 text-white px-6 rounded-xl font-bold text-xs">OK</button>
+                </div>
+                <div id="lista-categorias-config" class="grid grid-cols-1 md:grid-cols-2 gap-2 max-h-96 overflow-y-auto pr-2"></div>
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        // ESTRUCTURA DE DATOS INICIAL BASADA EN TUS EXCEL
+        let db = JSON.parse(localStorage.getItem('elite_v8_final')) || {
+            movimientos: [],
+            activos: [
+                { nombre: "INMUEBLE 1", valor: 0, deuda: 0 },
+                { nombre: "INMUEBLE 2", valor: 0, deuda: 0 },
+                { nombre: "AUTOMÓVIL 1", valor: 0, deuda: 0 },
+                { nombre: "TARJETA CRÉDITO 1", valor: 0, deuda: 0 }
+            ],
+            categorias: [
+                { nombre: "Salario", padre: "INGRESOS" },
+                { nombre: "Ventas", padre: "INGRESOS" },
+                { nombre: "Hipoteca", padre: "GASTOS" },
+                { nombre: "Servicios Públicos", padre: "GASTOS" },
+                { nombre: "Alimentación", padre: "GASTOS" },
+                { nombre: "Transporte", padre: "GASTOS" },
+                { nombre: "Hijos/Educación", padre: "GASTOS" },
+                { nombre: "Mascotas", padre: "GASTOS" }
+            ]
+        };
+
+        // NAVEGACIÓN
+        function showTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('nav button').forEach(b => b.classList.remove('active-nav'));
+            
+            document.getElementById(tabId).classList.add('active');
+            document.getElementById('nav-' + tabId).classList.add('active-nav');
+            
+            window.scrollTo(0, 0);
+            render();
+        }
+
+        // LÓGICA DE REGISTRO
+        document.getElementById('form-registro').onsubmit = (e) => {
+            e.preventDefault();
+            const mov = {
+                id: Date.now(),
+                fecha: document.getElementById('reg-fecha').value,
+                monto: parseFloat(document.getElementById('reg-monto').value),
+                catFull: document.getElementById('reg-cat').value,
+                nota: document.getElementById('reg-nota').value
+            };
+            db.movimientos.unshift(mov);
+            save();
+            document.getElementById('form-registro').reset();
+            setFechaHoy();
+            showTab('tab-dash');
+        };
+
+        function crearCategoria() {
+            const nombre = document.getElementById('nueva-cat-nombre').value;
+            const padre = document.getElementById('nueva-cat-padre').value;
+            if(nombre) {
+                db.categorias.push({ nombre, padre });
+                document.getElementById('nueva-cat-nombre').value = '';
+                save();
+            }
+        }
+
+        function borrarCat(index) {
+            if(confirm("¿Eliminar categoría?")) {
+                db.categorias.splice(index, 1);
+                save();
+            }
+        }
+
+        // LÓGICA DE ACTIVOS
+        function agregarActivo() {
+            const nombre = prompt("Nombre del activo/deuda:");
+            if(nombre) {
+                db.activos.push({ nombre, valor: 0, deuda: 0 });
+                save();
+            }
+        }
+
+        function updateActivo(index, campo, valor) {
+            db.activos[index][campo] = parseFloat(valor) || 0;
+            save();
+        }
+
+        function save() {
+            localStorage.setItem('elite_v8_final', JSON.stringify(db));
+            render();
+        }
+
+        // RENDERIZADO PRINCIPAL
+        function render() {
+            // Cargar select de categorías
+            const select = document.getElementById('reg-cat');
+            const catActual = select.value;
+            select.innerHTML = db.categorias.map(c => `<option value="${c.padre}|${c.nombre}">${c.padre} > ${c.nombre}</option>`).join('');
+            if(catActual) select.value = catActual;
+
+            // Procesar Totales
+            let tIng = 0, tGas = 0, tVal = 0, tDeu = 0;
+            const agrupaIng = {}, agrupaGas = {};
+
+            db.movimientos.forEach(m => {
+                const [padre, hijo] = m.catFull.split('|');
+                if(padre === 'INGRESOS') {
+                    tIng += m.monto;
+                    agrupaIng[hijo] = (agrupaIng[hijo] || 0) + m.monto;
+                } else {
+                    tGas += m.monto;
+                    agrupaGas[hijo] = (agrupaGas[hijo] || 0) + m.monto;
+                }
+            });
+
+            db.activos.forEach(a => { tVal += a.valor; tDeu += a.deuda; });
+
+            // Dashboard Superior
+            document.getElementById('total-ingresos').innerText = `$${tIng.toLocaleString()}`;
+            document.getElementById('total-gastos').innerText = `$${tGas.toLocaleString()}`;
+            document.getElementById('total-deuda').innerText = `$${tDeu.toLocaleString()}`;
+            document.getElementById('total-patrimonio').innerText = `$${(tVal - tDeu + (tIng - tGas)).toLocaleString()}`;
+            document.getElementById('val-flujo-neto').innerText = `$${(tIng - tGas).toLocaleString()}`;
+
+            // Render Listas Dashboard
+            renderAcordeon('container-ingresos', agrupaIng, 'text-emerald-600');
+            renderAcordeon('container-gastos', agrupaGas, 'text-red-600');
+
+            // Render Activos
+            const contAct = document.getElementById('container-activos');
+            contAct.innerHTML = db.activos.map((a, i) => `
+                <div class="bg-white p-5 rounded-3xl border border-slate-200 shadow-sm relative group">
+                    <button onclick="db.activos.splice(${i},1);save()" class="absolute top-2 right-2 text-slate-200 hover:text-red-400 text-[10px]"><i class="fas fa-trash"></i></button>
+                    <p class="text-[9px] font-black text-slate-400 mb-3 uppercase tracking-tighter">${a.nombre}</p>
+                    <div class="space-y-3">
+                        <div class="flex justify-between items-center text-[10px] font-bold">
+                            <span>VALOR</span>
+                            <input type="number" onchange="updateActivo(${i},'valor',this.value)" value="${a.valor}" class="w-24 text-right bg-slate-50 p-1 rounded font-black">
+                        </div>
+                        <div class="flex justify-between items-center text-[10px] font-bold">
+                            <span class="text-red-400">DEUDA</span>
+                            <input type="number" onchange="updateActivo(${i},'deuda',this.value)" value="${a.deuda}" class="w-24 text-right bg-slate-50 p-1 rounded font-black text-red-500">
+                        </div>
+                        <div class="pt-2 border-t flex justify-between items-center">
+                            <span class="text-[10px] font-black text-slate-400">ACTIVO REAL</span>
+                            <span class="font-black text-emerald-500">$${(a.valor - a.deuda).toLocaleString()}</span>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+
+            // Lista Configuración Categorías
+            const listConf = document.getElementById('lista-categorias-config');
+            listConf.innerHTML = db.categorias.map((c, i) => `
+                <div class="bg-slate-50 p-3 rounded-xl flex justify-between items-center">
+                    <div>
+                        <p class="text-[8px] font-bold text-slate-400 uppercase">${c.padre}</p>
+                        <p class="text-xs font-bold">${c.nombre}</p>
+                    </div>
+                    <button onclick="borrarCat(${i})" class="text-slate-300 hover:text-red-500"><i class="fas fa-times-circle"></i></button>
+                </div>
+            `).join('');
+        }
+
+        function renderAcordeon(id, datos, color) {
+            const container = document.getElementById(id);
+            container.innerHTML = Object.entries(datos).length ? '' : '<p class="text-[10px] text-slate-300 italic p-4">Sin datos registrados...</p>';
+            for (const [nombre, monto] of Object.entries(datos)) {
+                container.innerHTML += `
+                    <div class="bg-white p-4 rounded-2xl border border-slate-100 flex justify-between items-center shadow-sm">
+                        <span class="text-[11px] font-bold text-slate-600 uppercase tracking-tighter">${nombre}</span>
+                        <span class="font-black ${color}">$${monto.toLocaleString()}</span>
+                    </div>
+                `;
+            }
+        }
+
+        function setFechaHoy() { document.getElementById('reg-fecha').valueAsDate = new Date(); }
+
+        function exportarDatos() {
+            let csv = "\uFEFFFecha,Categoria,Monto,Nota\n";
+            db.movimientos.forEach(m => csv += `${m.fecha},${m.catFull},${m.monto},${m.nota}\n`);
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `Corte_Financiero_${new Date().toISOString().slice(0,10)}.csv`;
+            link.click();
+        }
+
+        // INICIO
+        setFechaHoy();
+        render();
+    </script>
+</body>
+</html>
