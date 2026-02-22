@@ -3,157 +3,214 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Elite Finance v9 | Estructura Oficial</title>
+    <title>Elite Finance Pro v11</title>
     
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/2489/2489756.png">
     
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
-        body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
         
-        /* Estilos del Documento Word Oficial */
-        .cat-principal { background-color: #fef08a; text-decoration: underline; font-weight: 800; color: black; text-transform: uppercase; }
-        .cat-secundaria { color: #1d4ed8; font-weight: 600; font-size: 0.9rem; }
-        .sub-categoria { color: black; font-size: 11px; text-transform: uppercase; }
+        body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; background-color: #f8fafc; }
 
+        /* ESTILOS SEGÚN DOCUMENTO WORD OFICIAL */
+        .cat-principal { 
+            background-color: #fef08a !important; /* Amarillo */
+            text-decoration: underline; 
+            font-weight: 800; 
+            color: #000; 
+            text-transform: uppercase;
+            padding: 8px 12px;
+            border-radius: 4px;
+        }
+        
+        .cat-secundaria { 
+            color: #1d4ed8 !important; /* Azul */
+            font-weight: 600; 
+            font-size: 14px;
+        }
+        
+        .sub-categoria { 
+            color: #000 !important; 
+            font-size: 11px !important; 
+            text-transform: uppercase;
+            font-weight: 400;
+        }
+
+        /* Navegación y UI */
         .tab-content { display: none; }
         .tab-content.active { display: block; animation: fadeIn 0.2s ease; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         .active-nav { border-bottom: 4px solid #4f46e5; color: #4f46e5; font-weight: 800; }
         
-        .custom-scroll::-webkit-scrollbar { width: 4px; }
-        .custom-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        details > summary { list-style: none; outline: none; }
+        details > summary::-webkit-details-marker { display: none; }
+        
+        .card-shadow { box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1); }
     </style>
 </head>
-<body class="bg-slate-50 min-h-screen pb-20">
+<body class="min-h-screen pb-24">
 
     <header class="bg-slate-900 text-white sticky top-0 z-50 shadow-2xl">
-        <div class="max-w-7xl mx-auto px-4 py-4">
+        <div class="max-w-4xl mx-auto px-4 py-4">
             <div class="flex justify-between items-center mb-4">
-                <h1 class="text-lg font-black tracking-tighter text-indigo-400">ELITE FINANCE <span class="text-white text-[10px] ml-2 px-2 py-0.5 bg-indigo-600 rounded">V9</span></h1>
-                <div class="flex gap-2">
-                    <button onclick="exportarDatos()" class="bg-white/10 p-2 rounded-lg text-xs"><i class="fas fa-file-export"></i></button>
-                    <button onclick="borrarTodo()" class="bg-red-500/20 p-2 rounded-lg text-xs text-red-400"><i class="fas fa-trash-alt"></i></button>
+                <h1 class="text-xl font-black tracking-tighter text-indigo-400 italic">ELITE FINANCE <span class="text-white text-[10px] not-italic bg-indigo-600 px-2 rounded ml-1">V11.0</span></h1>
+                <div class="flex gap-3">
+                    <button onclick="exportarDatos()" class="bg-white/10 p-2 rounded-lg text-xs"><i class="fas fa-file-download"></i></button>
+                    <button onclick="borrarTodo()" class="bg-red-500/20 p-2 rounded-lg text-xs text-red-400"><i class="fas fa-sync-alt"></i></button>
                 </div>
             </div>
             
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
-                <div class="bg-white/5 p-3 rounded-xl border border-white/10">
-                    <p class="text-[8px] font-bold text-slate-400 uppercase">Patrimonio Neto</p>
-                    <p id="total-patrimonio" class="text-lg font-black text-indigo-300">$0.00</p>
+            <div class="grid grid-cols-2 gap-3">
+                <div onclick="toggleModal('patrimonio')" class="bg-white/5 p-4 rounded-2xl border border-white/10 cursor-pointer hover:bg-white/10 transition active:scale-95">
+                    <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">Patrimonio Neto <i class="fas fa-eye ml-1 opacity-50"></i></p>
+                    <p id="total-patrimonio" class="text-xl font-black text-indigo-300">$0.00</p>
                 </div>
-                <div class="bg-white/5 p-3 rounded-xl border border-white/10 text-emerald-400">
-                    <p class="text-[8px] font-bold text-slate-400 uppercase">Ingresos Mes</p>
-                    <p id="total-ingresos" class="text-lg font-black">$0.00</p>
-                </div>
-                <div class="bg-white/5 p-3 rounded-xl border border-white/10 text-red-400">
-                    <p class="text-[8px] font-bold text-slate-400 uppercase">Gastos Mes</p>
-                    <p id="total-gastos" class="text-lg font-black">$0.00</p>
-                </div>
-                <div class="bg-white/5 p-3 rounded-xl border border-white/10 text-amber-400">
-                    <p class="text-[8px] font-bold text-slate-400 uppercase">Deudas Acum.</p>
-                    <p id="total-deuda" class="text-lg font-black">$0.00</p>
+                <div onclick="toggleModal('deudas')" class="bg-white/5 p-4 rounded-2xl border border-white/10 cursor-pointer hover:bg-white/10 transition active:scale-95">
+                    <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">Deuda a la Fecha <i class="fas fa-eye ml-1 opacity-50"></i></p>
+                    <p id="total-deuda" class="text-xl font-black text-amber-400">$0.00</p>
                 </div>
             </div>
         </div>
 
-        <nav class="bg-white flex justify-around border-b border-slate-200 shadow-sm">
-            <button onclick="showTab('tab-dash')" id="nav-tab-dash" class="py-3 px-2 text-[10px] font-bold uppercase tracking-tighter text-slate-400 active-nav">Resumen</button>
-            <button onclick="showTab('tab-reg')" id="nav-tab-reg" class="py-3 px-2 text-[10px] font-bold uppercase tracking-tighter text-slate-400">Registrar</button>
-            <button onclick="showTab('tab-act')" id="nav-tab-act" class="py-3 px-2 text-[10px] font-bold uppercase tracking-tighter text-slate-400">Patrimonio</button>
-            <button onclick="showTab('tab-hist')" id="nav-tab-hist" class="py-3 px-2 text-[10px] font-bold uppercase tracking-tighter text-slate-400">Historial</button>
+        <nav class="bg-white flex justify-around border-b border-slate-200">
+            <button onclick="showTab('tab-dash')" id="nav-tab-dash" class="py-4 px-2 text-[10px] font-black uppercase text-slate-400 active-nav">Resumen</button>
+            <button onclick="showTab('tab-reg')" id="nav-tab-reg" class="py-4 px-2 text-[10px] font-black uppercase text-slate-400">Registrar</button>
+            <button onclick="showTab('tab-act')" id="nav-tab-act" class="py-4 px-2 text-[10px] font-black uppercase text-slate-400">Activos</button>
+            <button onclick="showTab('tab-hist')" id="nav-tab-hist" class="py-4 px-2 text-[10px] font-black uppercase text-slate-400">Historial</button>
         </nav>
     </header>
 
     <main class="max-w-4xl mx-auto p-4">
 
         <div id="tab-dash" class="tab-content active space-y-6">
-            <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-200">
-                <div class="flex justify-between items-center mb-4 border-b pb-2">
-                    <h3 class="text-xs font-black uppercase text-slate-400">Flujo Mensual</h3>
-                    <span id="flujo-mes" class="font-black text-xl">$0.00</span>
-                </div>
-                <div id="resumen-estructura" class="space-y-4 max-h-[60vh] overflow-y-auto custom-scroll pr-2">
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="bg-white p-5 rounded-3xl card-shadow border border-slate-200">
+                    <h3 class="text-[10px] font-black text-slate-400 uppercase mb-4 text-center tracking-widest">Fuentes de Ingresos</h3>
+                    <div class="relative h-48">
+                        <canvas id="chartIngresos"></canvas>
                     </div>
+                </div>
+                <div class="bg-white p-5 rounded-3xl card-shadow border border-slate-200">
+                    <h3 class="text-[10px] font-black text-slate-400 uppercase mb-4 text-center tracking-widest">Distribución de Gastos</h3>
+                    <div class="relative h-48">
+                        <canvas id="chartGastos"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-3xl card-shadow border border-slate-200 overflow-hidden">
+                <details class="group" open>
+                    <summary class="flex justify-between items-center p-6 cursor-pointer bg-slate-900 text-white">
+                        <div>
+                            <span class="font-black text-xs uppercase tracking-widest opacity-70 block mb-1">Flujo de Caja Mensual</span>
+                            <span id="flujo-mes" class="font-black text-2xl leading-none">$0.00</span>
+                        </div>
+                        <i class="fas fa-chevron-down transition-transform group-open:rotate-180"></i>
+                    </summary>
+                    <div id="resumen-estructura" class="p-4 space-y-4 bg-slate-50">
+                        </div>
+                </details>
             </div>
         </div>
 
         <div id="tab-reg" class="tab-content max-w-xl mx-auto">
-            <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-200">
-                <h2 class="text-sm font-black text-slate-800 mb-6 uppercase">Nuevo Registro</h2>
-                <form id="form-registro" class="space-y-5">
+            <div class="bg-white p-8 rounded-3xl card-shadow border border-slate-200">
+                <h2 class="text-sm font-black text-slate-800 mb-6 uppercase text-center tracking-tighter">Nuevo Asiento Contable</h2>
+                <form id="form-registro" class="space-y-4">
                     <div class="grid grid-cols-2 gap-4">
-                        <input type="date" id="reg-fecha" class="p-3 bg-slate-50 border rounded-xl outline-none text-sm" required>
-                        <input type="number" id="reg-monto" step="0.01" class="p-3 bg-slate-50 border rounded-xl outline-none font-black text-indigo-600" placeholder="0.00" required>
+                        <div class="flex flex-col gap-1">
+                            <label class="text-[9px] font-black text-slate-400 uppercase">Fecha</label>
+                            <input type="date" id="reg-fecha" class="p-3 bg-slate-50 border rounded-xl outline-none font-bold text-sm" required>
+                        </div>
+                        <div class="flex flex-col gap-1">
+                            <label class="text-[9px] font-black text-slate-400 uppercase">Monto ($)</label>
+                            <input type="number" id="reg-monto" step="0.01" class="p-3 bg-slate-50 border rounded-xl outline-none font-black text-indigo-600 text-lg" placeholder="0.00" required>
+                        </div>
                     </div>
-                    
-                    <div class="space-y-2">
-                        <label class="text-[10px] font-bold text-slate-400 uppercase">Subcategoría (Nivel 3)</label>
+                    <div class="flex flex-col gap-1">
+                        <label class="text-[9px] font-black text-slate-400 uppercase">Seleccionar Categoría (Nivel 3)</label>
                         <select id="reg-cat" class="w-full p-3 bg-slate-50 border rounded-xl outline-none text-xs font-bold" required></select>
                     </div>
-
-                    <input type="text" id="reg-nota" class="w-full p-3 bg-slate-50 border rounded-xl outline-none text-sm" placeholder="Comentario (Ej: Mercado de la quincena)">
-                    
-                    <button type="submit" class="w-full bg-slate-900 text-white font-black py-4 rounded-2xl shadow-xl hover:bg-indigo-600 transition uppercase tracking-widest text-xs">Guardar Movimiento</button>
+                    <div class="flex flex-col gap-1">
+                        <label class="text-[9px] font-black text-slate-400 uppercase">Nota Adicional</label>
+                        <input type="text" id="reg-nota" class="w-full p-3 bg-slate-50 border rounded-xl outline-none text-sm" placeholder="Ej: Pago de hipoteca febrero">
+                    </div>
+                    <button type="submit" class="w-full bg-slate-900 text-white font-black py-4 rounded-2xl shadow-xl hover:bg-indigo-600 transition uppercase tracking-widest text-xs mt-4">Procesar y Guardar</button>
                 </form>
             </div>
         </div>
 
         <div id="tab-act" class="tab-content space-y-6">
             <div id="grid-activos" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
-            <button onclick="agregarActivo()" class="w-full bg-indigo-600 text-white p-4 rounded-2xl font-black text-xs uppercase">+ Registrar Nuevo Activo Fijo</button>
+            <button onclick="agregarActivo()" class="w-full bg-indigo-600 text-white p-4 rounded-2xl font-black text-xs uppercase shadow-lg hover:bg-indigo-700 transition">+ Añadir Ítem a Planilla de Activos</button>
         </div>
 
         <div id="tab-hist" class="tab-content">
-            <div class="bg-white rounded-3xl border overflow-hidden shadow-sm">
-                <table class="w-full text-left text-xs">
-                    <thead class="bg-slate-50 font-black text-slate-400 uppercase border-b">
-                        <tr><th class="p-4">Fecha</th><th class="p-4">Detalle</th><th class="p-4 text-right">Monto</th></tr>
-                    </thead>
-                    <tbody id="lista-movimientos" class="divide-y divide-slate-100"></tbody>
-                </table>
+            <div class="bg-white rounded-3xl border overflow-hidden card-shadow">
+                <div id="lista-movimientos" class="divide-y divide-slate-100 max-h-[70vh] overflow-y-auto">
+                    </div>
             </div>
         </div>
 
     </main>
 
+    <div id="modal-container" class="fixed inset-0 bg-slate-900/90 z-[100] hidden flex items-center justify-center p-4">
+        <div class="bg-white w-full max-w-md rounded-3xl overflow-hidden shadow-2xl animate-in zoom-in duration-200">
+            <div class="p-6 border-b flex justify-between items-center bg-slate-50">
+                <h3 id="modal-titulo" class="font-black text-xs uppercase text-slate-500 tracking-widest">Desglose Detallado</h3>
+                <button onclick="toggleModal()" class="text-slate-400 hover:text-red-500 transition"><i class="fas fa-times-circle text-2xl"></i></button>
+            </div>
+            <div id="modal-contenido" class="p-6 max-h-[60vh] overflow-y-auto space-y-4">
+                </div>
+            <div class="p-4 bg-slate-50 text-center">
+                <button onclick="toggleModal()" class="text-[10px] font-black uppercase text-slate-400">Cerrar Ventana</button>
+            </div>
+        </div>
+    </div>
+
     <script>
-        // DATA BASE OFICIAL SEGÚN WORD [cite: 1-106]
+        // CONFIGURACIÓN DE CATEGORÍAS SEGÚN WORD OFICIAL
         const ESTRUCTURA_OFICIAL = {
-            "INGRESOS": { // Nivel 1 [cite: 5]
-                "SUELDO": ["MENSUAL ADULTO 1", "MENSUAL ADULTO 2"], // Nivel 2 y 3 [cite: 6, 7]
-                "EXTRAS": ["BONOS/REGALOS", "INGRESOS POR VENTAS"] // [cite: 8, 9]
+            "INGRESOS": {
+                "INGRESOS ADULTOS": ["INGRESOS MENSUALES ADULTO 1", "INGRESOS MENSUALES ADULTO 2"],
+                "INGRESOS EXTRAS": ["BONOS/REGALOS", "INGRESOS POR VENTAS"]
             },
-            "GASTOS": { // 
-                "INMUEBLE 1": ["HIPOTECA", "IMPUESTOS", "ADMINISTRACIÓN", "MANTENIMIENTO", "OTROS"], // [cite: 11-16]
-                "INMUEBLE 2": ["HIPOTECA", "IMPUESTOS", "ADMINISTRACIÓN", "MANTENIMIENTO", "OTROS"], // [cite: 17-22]
-                "SERVICIOS": ["ELECTRICIDAD", "AGUA", "GAS", "TELEFONOS", "APP O SUSCRIPCIONES", "INTERNET / TV", "OTROS"], // [cite: 23-30]
-                "ALIMENTACIÓN": ["MERCADOS", "RESTAURANTES", "CAFÉ/MERIENDA", "CIGARRILLOS", "OTROS"], // [cite: 31-36]
-                "TRANSPORTE": ["BUSES/TRENES", "CUOTA AUTOMÓVIL 1", "CUOTA AUTOMÓVIL 2", "GASOLINA", "PEAJES", "IMPUESTOS", "MANTENIMIENTO", "SEGUROS", "PARQUEADORES", "OTROS"], // [cite: 37-47]
-                "HIJOS": ["COLEGIOS", "MATRÍCULAS ESCOLARES", "ACTIVIDADES EXTRA", "MESADA", "ÚTILES ESCOLARES", "REGALOS Y FIESTAS", "CLASES EXTRA", "TERAPIAS/OTROS", "AYUDA DOMÉSTICA", "TRANSPORTE ESCOLAR", "VIAJES ESCOLARES", "CUOTA ALIMENTARIA", "OTROS"], // [cite: 48-61]
-                "EDUCACIÓN ADULTOS": ["OTRO"], // [cite: 62]
-                "SALUD": ["SEGURO MÉDICO", "DENTISTA", "MEDICINAS", "PAGOS NO CUBIERTOS POR SEGURO", "OTROS"], // [cite: 63-68]
-                "MASCOTAS": ["SEGURO", "COMIDA", "CUIDADOS", "OTROS"], // [cite: 69-73]
-                "VESTUARIO": ["UNIFORMES HIJOS", "ROPA HIJOS", "ROPA ADULTOS", "IMPLEMENTOS DEPORTIVOS", "SALÓN DE BELLEZA", "PELUQUERÍA", "COSMÉTICOS", "OTROS"], // [cite: 74-82]
-                "OTROS GASTOS": ["REGALOS", "FIESTAS Y CELEBRACIONES", "VACACIONES", "SALIDAS FIN DE SEMANA", "AYUDA A PARIENTES", "DONACIONES", "HOBBIES/PASATIEMPOS", "GASTOS MISCELÁNEOS"], // [cite: 83-91]
-                "SEGUROS": ["SEGURO MÉDICO", "SEGURO DENTÍSTA", "SEGURO DE VIDA", "SEGURO MORTUORIO", "OTROS SEGUROS"], // [cite: 92-97]
-                "DEUDAS": ["TARJETA DE CRÉDITO 1", "TARJETA DE CRÉDITO 2", "TARJETA DE CRÉDITO 3", "OTRA DEUDA 1", "OTRA DEUDA 2", "DEUDAS FAMILIARES", "DEUDA CON LA EMPRESA", "CRÉDITO DE EDUCACIÓN"] // 
+            "GASTOS": {
+                "GASTOS INMUEBLE 1": ["HIPOTECA", "IMPUESTOS", "ADMINISTRACIÓN", "MANTENIMIENTO", "OTROS"],
+                "GASTOS INMUEBLE 2": ["HIPOTECA", "IMPUESTOS", "ADMINISTRACIÓN", "MANTENIMIENTO", "OTROS"],
+                "SERVICIOS": ["ELECTRICIDAD", "AGUA", "GAS", "TELEFONOS", "APP O SUSCRIPCIONES", "INTERNET / TV", "OTROS"],
+                "ALIMENTACIÓN": ["MERCADOS", "RESTAURANTES", "GASTOS DIARIOS CAFÉ/MERIENDA", "CIGARRILLOS", "OTROS"],
+                "TRANSPORTE": ["BUSES/TRENES", "CUOTA AUTOMÓVIL 1", "CUOTA AUTOMÓVIL 2", "GASOLINA", "PEAJES", "IMPUESTOS", "MANTENIMIENTO", "SEGUROS", "PARQUEADORES", "OTROS"],
+                "HIJOS": ["COLEGIOS", "MATRÍCULAS ESCOLARES", "ACTIVIDADES EXTRA", "MESADA", "ÚTILES ESCOLARES", "REGALOS Y FIESTAS", "CLASES EXTRA", "TERAPIAS/OTROS", "AYUDA DOMÉSTICA", "TRANSPORTE ESCOLAR", "VIAJES ESCOLARES", "CUOTA ALIMENTARIA", "OTROS"],
+                "SALUD": ["SEGURO MÉDICO", "DENTISTA", "MEDICINAS", "PAGOS NO CUBIERTOS", "OTROS"],
+                "MASCOTAS": ["SEGURO", "COMIDA", "CUIDADOS", "OTROS"],
+                "VESTUARIO": ["UNIFORMES HIJOS", "ROPA HIJOS", "ROPA ADULTOS", "SALÓN DE BELLEZA", "COSMÉTICOS", "OTROS"],
+                "OTROS GASTOS": ["REGALOS", "FIESTAS", "VACACIONES", "SALIDAS", "AYUDAS", "DONACIONES", "HOBBIES"],
+                "SEGUROS": ["MÉDICO", "DENTISTA", "VIDA", "MORTUORIO", "OTROS"],
+                "DEUDAS": ["TARJETA 1", "TARJETA 2", "TARJETA 3", "CRÉDITO EDUCACIÓN", "OTRA DEUDA"]
             }
         };
 
-        let db = JSON.parse(localStorage.getItem('elite_v9_data')) || {
+        // BASE DE DATOS LOCAL
+        let db = JSON.parse(localStorage.getItem('elite_v11_final')) || {
             movimientos: [],
             activos: [
-                { nombre: "Inmueble Principal", valor: 0, deuda: 0 },
-                { nombre: "Vehículo Familiar", valor: 0, deuda: 0 }
+                { nombre: "INMUEBLE 1", valor: 0, deuda: 0 },
+                { nombre: "INMUEBLE 2", valor: 0, deuda: 0 },
+                { nombre: "AUTOMÓVIL 1", valor: 0, deuda: 0 },
+                { nombre: "EFECTIVO/CUENTAS", valor: 0, deuda: 0 }
             ]
         };
 
+        let activeCharts = { ing: null, gas: null };
+
+        // NAVEGACIÓN
         function showTab(tabId) {
             document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('nav button').forEach(b => b.classList.remove('active-nav'));
@@ -162,123 +219,170 @@
             render();
         }
 
+        // MODALES DRILL-DOWN
+        function toggleModal(type) {
+            const m = document.getElementById('modal-container');
+            if(!type) { m.classList.add('hidden'); return; }
+            
+            m.classList.remove('hidden');
+            const cont = document.getElementById('modal-contenido');
+            cont.innerHTML = '';
+
+            if(type === 'patrimonio') {
+                document.getElementById('modal-titulo').innerText = "Resumen de Patrimonio";
+                let tVal = 0, tDeu = 0;
+                db.activos.forEach(a => {
+                    tVal += a.valor; tDeu += a.deuda;
+                    cont.innerHTML += `
+                        <div class="flex justify-between items-center bg-slate-50 p-3 rounded-xl">
+                            <span class="text-xs font-bold text-slate-600">${a.nombre}</span>
+                            <span class="font-black text-emerald-600">$${(a.valor - a.deuda).toLocaleString()}</span>
+                        </div>`;
+                });
+                cont.innerHTML += `<div class="pt-4 border-t text-right font-black text-indigo-600">Total Equity: $${(tVal - tDeu).toLocaleString()}</div>`;
+            } else {
+                document.getElementById('modal-titulo').innerText = "Desglose de Pasivos";
+                db.activos.filter(a => a.deuda > 0).forEach(a => {
+                    cont.innerHTML += `
+                        <div class="flex justify-between items-center bg-red-50 p-3 rounded-xl border border-red-100">
+                            <span class="text-xs font-bold text-red-800">${a.nombre}</span>
+                            <span class="font-black text-red-600">$${a.deuda.toLocaleString()}</span>
+                        </div>`;
+                });
+                if(cont.innerHTML === '') cont.innerHTML = '<p class="text-center text-slate-400 text-xs">No hay deudas registradas en activos.</p>';
+            }
+        }
+
+        // MOTOR DE RENDERIZADO
         function render() {
+            // Llenar selector de categorías una sola vez
             const select = document.getElementById('reg-cat');
             if(select.innerHTML === "") {
-                for (const [principal, secundarias] of Object.entries(ESTRUCTURA_OFICIAL)) {
-                    for (const [secundaria, subcats] of Object.entries(secundarias)) {
-                        subcats.forEach(sub => {
+                for (const [p, secs] of Object.entries(ESTRUCTURA_OFICIAL)) {
+                    for (const [s, subs] of Object.entries(secs)) {
+                        subs.forEach(sub => {
                             let opt = document.createElement('option');
-                            opt.value = `${principal}|${secundaria}|${sub}`;
-                            opt.textContent = `${principal} > ${secundaria} > ${sub}`;
+                            opt.value = `${p}|${s}|${sub}`;
+                            opt.textContent = `${p} > ${s} > ${sub}`;
                             select.appendChild(opt);
                         });
                     }
                 }
             }
 
-            let tIng = 0, tGas = 0, tDeu = 0, tValAct = 0;
-            const resPrincipal = { "INGRESOS": 0, "GASTOS": 0 };
-            const resSecundaria = {};
+            let tIng = 0, tGas = 0, tVal = 0, tDeu = 0;
+            const agrupaIng = {}, agrupaGas = {};
 
             db.movimientos.forEach(m => {
                 const [p, s, sub] = m.catPath.split('|');
-                resPrincipal[p] += m.monto;
-                if(!resSecundaria[s]) resSecundaria[s] = 0;
-                resSecundaria[s] += m.monto;
-                if(p === "INGRESOS") tIng += m.monto; else tGas += m.monto;
+                if(p === "INGRESOS") {
+                    tIng += m.monto;
+                    agrupaIng[s] = (agrupaIng[s] || 0) + m.monto;
+                } else {
+                    tGas += m.monto;
+                    agrupaGas[s] = (agrupaGas[s] || 0) + m.monto;
+                }
             });
 
-            db.activos.forEach(a => { tValAct += a.valor; tDeu += a.deuda; });
+            db.activos.forEach(a => { tVal += a.valor; tDeu += a.deuda; });
 
-            // Dashboard
-            document.getElementById('total-ingresos').innerText = `$${tIng.toLocaleString()}`;
-            document.getElementById('total-gastos').innerText = `$${tGas.toLocaleString()}`;
+            // Dashboard Superior
+            const flujoActual = tIng - tGas;
+            document.getElementById('total-ingresos-label')?.remove(); // Cleanup labels
             document.getElementById('total-deuda').innerText = `$${tDeu.toLocaleString()}`;
-            document.getElementById('total-patrimonio').innerText = `$${(tValAct - tDeu + (tIng - tGas)).toLocaleString()}`;
-            document.getElementById('flujo-mes').innerText = `$${(tIng - tGas).toLocaleString()}`;
-            document.getElementById('flujo-mes').className = (tIng - tGas) >= 0 ? 'text-emerald-500 font-black text-xl' : 'text-red-500 font-black text-xl';
+            document.getElementById('total-patrimonio').innerText = `$${(tVal - tDeu + flujoActual).toLocaleString()}`;
+            document.getElementById('flujo-mes').innerText = `$${flujoActual.toLocaleString()}`;
+            document.getElementById('flujo-mes').className = flujoActual >= 0 ? 'font-black text-2xl text-emerald-400' : 'font-black text-2xl text-red-400';
 
-            const containerDash = document.getElementById('resumen-estructura');
-            containerDash.innerHTML = '';
-            for (const [p, valP] of Object.entries(resPrincipal)) {
-                let html = `<div class="mb-6"><div class="cat-principal p-2 mb-2 text-xs">${p} - TOTAL: $${valP.toLocaleString()}</div>`;
-                for (const [secName, secList] of Object.entries(ESTRUCTURA_OFICIAL[p])) {
-                    const montoSec = resSecundaria[secName] || 0;
-                    html += `
-                        <details class="ml-2 mb-1">
-                            <summary class="cat-secundaria flex justify-between cursor-pointer p-1">
+            // Gráficos
+            updateCharts(agrupaIng, agrupaGas);
+
+            // Flujo Colapsable (Estilos Word)
+            const container = document.getElementById('resumen-estructura');
+            container.innerHTML = '';
+            
+            for (const [p, secs] of Object.entries(ESTRUCTURA_OFICIAL)) {
+                const totalP = db.movimientos.filter(m => m.catPath.startsWith(p)).reduce((a,b) => a+b.monto,0);
+                let htmlP = `<div class="cat-principal mb-3 shadow-sm">${p} - Total: $${totalP.toLocaleString()}</div>`;
+                
+                for (const [secName, subList] of Object.entries(secs)) {
+                    const montoSec = db.movimientos.filter(m => m.catPath.includes(secName)).reduce((a,b) => a+b.monto,0);
+                    htmlP += `
+                        <details class="ml-2 mb-2 bg-white rounded-xl border border-slate-200 overflow-hidden">
+                            <summary class="cat-secundaria p-4 flex justify-between cursor-pointer hover:bg-slate-50 transition">
                                 <span>${secName}</span>
-                                <span>$${montoSec.toLocaleString()}</span>
+                                <span class="font-black">$${montoSec.toLocaleString()}</span>
                             </summary>
-                            <div class="ml-4 py-1 space-y-1">
-                                ${secList.map(sub => {
+                            <div class="p-3 bg-slate-50/50 space-y-2 border-t border-slate-100">
+                                ${subList.map(sub => {
                                     const mSub = db.movimientos.filter(x => x.catPath.endsWith(sub)).reduce((a,b) => a+b.monto, 0);
-                                    return `<div class="sub-categoria flex justify-between border-b border-slate-50"><span>${sub}</span><span>$${mSub.toLocaleString()}</span></div>`;
+                                    return `<div class="sub-categoria flex justify-between py-1 border-b border-white">
+                                        <span>${sub}</span>
+                                        <span class="font-bold text-slate-900">$${mSub.toLocaleString()}</span>
+                                    </div>`;
                                 }).join('')}
                             </div>
                         </details>`;
                 }
-                html += `</div>`;
-                containerDash.innerHTML += html;
+                container.innerHTML += htmlP;
             }
 
-            // Historial
-            const lista = document.getElementById('lista-movimientos');
-            lista.innerHTML = db.movimientos.slice(0, 50).map(m => {
-                const parts = m.catPath.split('|');
-                const color = parts[0] === 'INGRESOS' ? 'text-emerald-500' : 'text-red-500';
-                return `<tr>
-                    <td class="p-4 text-slate-400 font-bold">${m.fecha}</td>
-                    <td class="p-4 font-bold text-slate-700">${parts[2]}<br><span class="text-[9px] text-slate-400">${m.nota || ''}</span></td>
-                    <td class="p-4 text-right font-black ${color}">$${m.monto.toLocaleString()}</td>
-                </tr>`;
-            }).join('');
-
             // Activos
-            const gridAct = document.getElementById('grid-activos');
-            gridAct.innerHTML = db.activos.map((a, i) => `
-                <div class="bg-white p-5 rounded-3xl border shadow-sm space-y-3">
-                    <p class="text-[10px] font-black text-slate-400 uppercase">${a.nombre}</p>
-                    <div class="flex justify-between items-center text-xs font-bold"><span>Valor</span><input type="number" value="${a.valor}" onchange="actAct(${i},'valor',this.value)" class="w-24 text-right bg-slate-50 p-1 rounded"></div>
-                    <div class="flex justify-between items-center text-xs font-bold"><span>Deuda</span><input type="number" value="${a.deuda}" onchange="actAct(${i},'deuda',this.value)" class="w-24 text-right bg-slate-50 p-1 rounded text-red-500"></div>
-                    <div class="pt-2 border-t flex justify-between font-black text-xs"><span>Real</span><span class="text-emerald-500">$${(a.valor-a.deuda).toLocaleString()}</span></div>
-                </div>
-            `).join('');
+            const gridA = document.getElementById('grid-activos');
+            gridA.innerHTML = db.activos.map((a, i) => `
+                <div class="bg-white p-6 rounded-3xl border card-shadow">
+                    <p class="text-[9px] font-black text-slate-400 mb-4 uppercase tracking-widest">${a.nombre}</p>
+                    <div class="space-y-4">
+                        <div class="flex justify-between items-center text-xs font-bold">
+                            <span>VALOR COMERCIAL</span>
+                            <input type="number" value="${a.valor}" onchange="upAct(${i},'valor',this.value)" class="w-24 text-right bg-slate-50 p-2 rounded-lg font-black text-slate-700">
+                        </div>
+                        <div class="flex justify-between items-center text-xs font-bold">
+                            <span class="text-red-400">DEUDA ASOCIADA</span>
+                            <input type="number" value="${a.deuda}" onchange="upAct(${i},'deuda',this.value)" class="w-24 text-right bg-slate-50 p-2 rounded-lg text-red-600 font-black">
+                        </div>
+                        <div class="pt-3 border-t flex justify-between items-center font-black">
+                            <span class="text-[10px] text-slate-400">EQUITY</span>
+                            <span class="text-emerald-500 text-lg">$${(a.valor-a.deuda).toLocaleString()}</span>
+                        </div>
+                    </div>
+                </div>`).join('');
+
+            // Historial
+            const hist = document.getElementById('lista-movimientos');
+            hist.innerHTML = db.movimientos.length ? db.movimientos.slice(0, 50).map((m, idx) => `
+                <div class="p-4 flex justify-between items-center hover:bg-slate-50 transition">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-full ${m.catPath.startsWith('ING') ? 'bg-emerald-100 text-emerald-600' : 'bg-red-100 text-red-600'} flex items-center justify-center text-[10px]">
+                            <i class="fas ${m.catPath.startsWith('ING') ? 'fa-arrow-up' : 'fa-arrow-down'}"></i>
+                        </div>
+                        <div>
+                            <p class="text-[10px] font-bold text-slate-400 uppercase">${m.fecha}</p>
+                            <p class="font-bold text-xs text-slate-800">${m.catPath.split('|')[2]}</p>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <p class="font-black text-sm ${m.catPath.startsWith('ING') ? 'text-emerald-600' : 'text-red-600'}">$${m.monto.toLocaleString()}</p>
+                        <button onclick="borrarMov(${idx})" class="text-[9px] text-slate-300 hover:text-red-500 uppercase font-bold">Eliminar</button>
+                    </div>
+                </div>`).join('') : '<p class="p-10 text-center text-slate-400 text-xs italic">No hay movimientos registrados este mes.</p>';
         }
 
-        document.getElementById('form-registro').onsubmit = (e) => {
-            e.preventDefault();
-            db.movimientos.unshift({
-                id: Date.now(),
-                fecha: document.getElementById('reg-fecha').value,
-                monto: parseFloat(document.getElementById('reg-monto').value),
-                catPath: document.getElementById('reg-cat').value,
-                nota: document.getElementById('reg-nota').value
+        // GRÁFICOS
+        function updateCharts(dataI, dataG) {
+            const config = (labels, vals, colors) => ({
+                type: 'doughnut',
+                data: {
+                    labels: labels,
+                    datasets: [{ data: vals, backgroundColor: colors, borderWidth: 0, hoverOffset: 4 }]
+                },
+                options: { 
+                    responsive: true, 
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false }, tooltip: { enabled: true } },
+                    cutout: '75%'
+                }
             });
-            save();
-            document.getElementById('form-registro').reset();
-            setHoy();
-            showTab('tab-dash');
-        };
 
-        function actAct(i, c, v) { db.activos[i][c] = parseFloat(v) || 0; save(); }
-        function agregarActivo() { const n = prompt("Nombre:"); if(n) { db.activos.push({nombre:n, valor:0, deuda:0}); save(); } }
-        function save() { localStorage.setItem('elite_v9_data', JSON.stringify(db)); render(); }
-        function setHoy() { document.getElementById('reg-fecha').valueAsDate = new Date(); }
-        function borrarTodo() { if(confirm("¿Borrar todo?")) { localStorage.clear(); location.reload(); } }
-        function exportarDatos() {
-            let csv = "\uFEFFFecha,Path,Monto,Nota\n";
-            db.movimientos.forEach(m => csv += `${m.fecha},${m.catPath},${m.monto},"${m.nota}"\n`);
-            const blob = new Blob([csv], { type: 'text/csv' });
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(blob);
-            link.download = `Elite_Finance_Report.csv`;
-            link.click();
-        }
-
-        setHoy();
-        render();
-    </script>
-</body>
-</html>
+            const colorsI = ['#10b981', '#34d399', '#6ee7b7', '#a7f3d0'];
+            const colorsG = ['#ef4444', '#f871
