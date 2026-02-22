@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Elite Finance v7 | Auditoría Total</title>
+    <title>Elite Finance v7.1 | Fix Navegación</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        .active-tab { border-bottom: 4px solid #4f46e5; color: #4f46e5; }
-        .bg-card { background: #ffffff; border: 1px solid #e2e8f0; }
+        .active-tab { border-bottom: 4px solid #4f46e5; color: #4f46e5; font-weight: 900; }
+        .hidden { display: none; }
         details > summary { list-style: none; }
         details > summary::-webkit-details-marker { display: none; }
     </style>
@@ -20,50 +20,23 @@
         <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
             <div>
                 <h1 class="text-xl font-black text-indigo-400 italic">ELITE FINANCE SYSTEM</h1>
-                <p class="text-[9px] uppercase tracking-widest text-slate-500 font-bold">Basado en Plantillas de Flujo & Activos</p>
+                <p class="text-[9px] uppercase tracking-widest text-slate-500 font-bold">Auditoría Total v7.1</p>
             </div>
-            <div class="flex gap-4">
-                <button onclick="switchTab('main')" id="btn-main" class="text-xs font-bold uppercase p-2 active-tab">Dashboard</button>
-                <button onclick="switchTab('registro')" id="btn-registro" class="text-xs font-bold uppercase p-2">Registrar</button>
-                <button onclick="switchTab('activos')" id="btn-activos" class="text-xs font-bold uppercase p-2">Patrimonio</button>
+            <div class="flex gap-2 sm:gap-4">
+                <button onclick="switchTab('main')" id="btn-main" class="text-[10px] sm:text-xs font-bold uppercase p-2 active-tab">Dashboard</button>
+                <button onclick="switchTab('registro')" id="btn-registro" class="text-[10px] sm:text-xs font-bold uppercase p-2">Registrar</button>
+                <button onclick="switchTab('activos')" id="btn-activos" class="text-[10px] sm:text-xs font-bold uppercase p-2">Patrimonio</button>
             </div>
         </div>
     </header>
 
     <main class="max-w-7xl mx-auto p-4 lg:p-6">
 
-        <div id="tab-main" class="space-y-8">
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <div class="bg-white p-5 rounded-2xl shadow-sm border-t-4 border-indigo-500">
-                    <p class="text-[10px] font-bold text-slate-400 uppercase mb-1 text-center">Patrimonio Neto</p>
-                    <p id="dash-neto" class="text-2xl font-black text-center">$0.00</p>
+        <div id="tab-main" class="tab-content space-y-8">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="bg-white p-4 rounded-2xl shadow-sm border-t-4 border-indigo-500">
+                    <p class="text-[9px] font-bold text-slate-400 uppercase mb-1">Patrimonio Neto</p>
+                    <p id="dash-neto" class="text-lg sm:text-2xl font-black">$0.00</p>
                 </div>
-                <div class="bg-white p-5 rounded-2xl shadow-sm border-t-4 border-emerald-500">
-                    <p class="text-[10px] font-bold text-slate-400 uppercase mb-1 text-center">Ingresos Mes</p>
-                    <p id="dash-ing" class="text-2xl font-black text-emerald-600 text-center">$0.00</p>
-                </div>
-                <div class="bg-white p-5 rounded-2xl shadow-sm border-t-4 border-red-500">
-                    <p class="text-[10px] font-bold text-slate-400 uppercase mb-1 text-center">Gastos Mes</p>
-                    <p id="dash-gas" class="text-2xl font-black text-red-600 text-center">$0.00</p>
-                </div>
-                <div class="bg-white p-5 rounded-2xl shadow-sm border-t-4 border-amber-500">
-                    <p class="text-[10px] font-bold text-slate-400 uppercase mb-1 text-center">Deuda Pendiente</p>
-                    <p id="dash-deu" class="text-2xl font-black text-amber-600 text-center">$0.00</p>
-                </div>
-            </div>
-
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                <div class="space-y-4">
-                    <h3 class="text-xs font-black uppercase text-slate-400 tracking-widest px-2">Estructura de Flujo (Gastos/Mes)</h3>
-                    <div id="acumulados-gastos" class="space-y-2"></div>
-                </div>
-                <div class="space-y-4">
-                    <h3 class="text-xs font-black uppercase text-slate-400 tracking-widest px-2">Estructura de Ingresos (Mes)</h3>
-                    <div id="acumulados-ingresos" class="space-y-2"></div>
-                    
-                    <div class="bg-indigo-900 text-white p-6 rounded-3xl shadow-lg mt-8">
-                        <h4 class="text-xs font-bold text-indigo-300 uppercase mb-4">Resumen de Operación</h4>
-                        <div class="flex justify-between border-b border-white/10 pb-2 mb-2">
-                            <span class="text-sm">Flujo de Caja Neto:</span>
-                            <span id="res-flujo" class="font-black">$0.00</span>
-                        </div>
+                <div class="bg-white p-4 rounded-2xl shadow-sm border-t-4 border-emerald-500">
+                    <p class="text-[9px] font-bold text-slate-400 uppercase
