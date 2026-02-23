@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Elite Finance Master v13</title>
+    <title>Elite Finance Master v14</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -11,7 +11,7 @@
     
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap');
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f1f5f9; }
 
         /* ESTILOS SEGÚN DOCUMENTO OFICIAL */
         .cat-principal-estilo { 
@@ -20,6 +20,8 @@
             font-weight: 800; 
             color: black; 
             text-transform: uppercase;
+            padding: 10px;
+            border-radius: 8px;
         }
         
         .cat-secundaria-estilo { 
@@ -35,8 +37,8 @@
         }
 
         .tab-content { display: none; }
-        .tab-content.active { display: block; animation: fadeIn 0.3s ease; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .tab-content.active { display: block; animation: slideUp 0.3s ease; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         
         .active-nav { border-bottom: 4px solid #4f46e5; color: #4f46e5; font-weight: 800; }
         details > summary { list-style: none; outline: none; }
@@ -48,281 +50,366 @@
     <header class="bg-slate-900 text-white sticky top-0 z-50 shadow-2xl">
         <div class="max-w-4xl mx-auto px-6 py-5">
             <div class="flex justify-between items-center mb-6">
-                <h1 class="text-xl font-black tracking-tighter text-indigo-400 italic">ELITE FINANCE PRO</h1>
+                <div>
+                    <h1 class="text-xl font-black tracking-tighter text-indigo-400 italic leading-none">ELITE FINANCE</h1>
+                    <p class="text-[8px] uppercase tracking-[0.3em] text-slate-500 mt-1">Gestión de Patrimonio v14</p>
+                </div>
                 <div class="flex gap-2">
-                    <button onclick="exportarExcel()" class="bg-white/10 p-2 rounded-lg text-xs"><i class="fas fa-file-export"></i></button>
-                    <button onclick="borrarBD()" class="bg-red-500/10 p-2 rounded-lg text-xs text-red-400"><i class="fas fa-sync"></i></button>
+                    <button onclick="exportarCSV()" class="bg-white/10 p-2.5 rounded-xl text-xs hover:bg-emerald-500/20 transition"><i class="fas fa-file-csv"></i></button>
+                    <button onclick="borrarTodo()" class="bg-red-500/10 p-2.5 rounded-xl text-xs text-red-400 hover:bg-red-500/20 transition"><i class="fas fa-sync"></i></button>
                 </div>
             </div>
             
             <div class="grid grid-cols-2 gap-4">
-                <div onclick="abrirDrillDown('patrimonio')" class="bg-white/5 border border-white/10 p-4 rounded-2xl cursor-pointer active:scale-95 transition">
-                    <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">Patrimonio Neto <i class="fas fa-search-plus ml-1"></i></p>
-                    <p id="kpi-patrimonio" class="text-2xl font-black text-indigo-300">$0.00</p>
+                <div onclick="verDetalle('patrimonio')" class="bg-indigo-500/10 border border-indigo-500/20 p-4 rounded-2xl cursor-pointer hover:bg-indigo-500/20 transition active:scale-95">
+                    <p class="text-[9px] font-bold text-indigo-300 uppercase tracking-widest mb-1">Patrimonio Neto <i class="fas fa-chart-line ml-1 opacity-50"></i></p>
+                    <p id="top-patrimonio" class="text-2xl font-black text-white">$0.00</p>
                 </div>
-                <div onclick="abrirDrillDown('deudas')" class="bg-white/5 border border-white/10 p-4 rounded-2xl cursor-pointer active:scale-95 transition">
-                    <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">Deuda Total <i class="fas fa-search-plus ml-1"></i></p>
-                    <p id="kpi-deuda" class="text-2xl font-black text-amber-400">$0.00</p>
+                <div onclick="verDetalle('deudas')" class="bg-amber-500/10 border border-amber-500/20 p-4 rounded-2xl cursor-pointer hover:bg-amber-500/20 transition active:scale-95">
+                    <p class="text-[9px] font-bold text-amber-300 uppercase tracking-widest mb-1">Deuda Vigente <i class="fas fa-hand-holding-dollar ml-1 opacity-50"></i></p>
+                    <p id="top-deuda" class="text-2xl font-black text-white">$0.00</p>
                 </div>
             </div>
         </div>
 
-        <nav class="bg-white flex justify-around border-b border-slate-200">
-            <button onclick="irTab('tab-resumen', this)" class="nav-btn py-4 px-2 text-[10px] font-bold uppercase active-nav">Resumen</button>
-            <button onclick="irTab('tab-registro', this)" class="nav-btn py-4 px-2 text-[10px] font-bold uppercase text-slate-400">Registrar</button>
-            <button onclick="irTab('tab-activos', this)" class="nav-btn py-4 px-2 text-[10px] font-bold uppercase text-slate-400">Activos</button>
-            <button onclick="irTab('tab-historial', this)" class="nav-btn py-4 px-2 text-[10px] font-bold uppercase text-slate-400">Historial</button>
+        <nav class="bg-white flex justify-around border-b border-slate-200 shadow-sm">
+            <button onclick="irA('tab-resumen', this)" class="nav-btn py-4 px-2 text-[10px] font-black uppercase active-nav">Resumen</button>
+            <button onclick="irA('tab-registro', this)" class="nav-btn py-4 px-2 text-[10px] font-black uppercase text-slate-400">Registrar</button>
+            <button onclick="irA('tab-activos', this)" class="nav-btn py-4 px-2 text-[10px] font-black uppercase text-slate-400">Activos</button>
+            <button onclick="irA('tab-historial', this)" class="nav-btn py-4 px-2 text-[10px] font-black uppercase text-slate-400">Historial</button>
         </nav>
     </header>
 
-    <main class="max-w-4xl mx-auto p-4">
+    <main class="max-w-4xl mx-auto p-4 sm:p-6">
 
         <div id="tab-resumen" class="tab-content active space-y-6">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div class="bg-white p-5 rounded-3xl border shadow-sm">
-                    <h3 class="text-[10px] font-black text-slate-400 uppercase mb-4 text-center">Ingresos</h3>
-                    <div class="h-44"><canvas id="chartIng"></canvas></div>
-                </div>
-                <div class="bg-white p-5 rounded-3xl border shadow-sm">
-                    <h3 class="text-[10px] font-black text-slate-400 uppercase mb-4 text-center">Gastos</h3>
-                    <div class="h-44"><canvas id="chartGas"></canvas></div>
-                </div>
+                <div class="bg-white p-6 rounded-3xl border shadow-sm"><canvas id="c-ing" class="h-40"></canvas></div>
+                <div class="bg-white p-6 rounded-3xl border shadow-sm"><canvas id="c-gas" class="h-40"></canvas></div>
             </div>
 
             <div class="bg-white rounded-3xl border shadow-sm overflow-hidden">
-                <details open>
-                    <summary class="flex justify-between items-center p-6 cursor-pointer bg-slate-800 text-white">
-                        <span class="font-black text-xs uppercase">Flujo Mensual</span>
-                        <span id="kpi-flujo" class="font-black text-xl">$0.00</span>
-                    </summary>
-                    <div id="contenedor-flujo" class="p-4 space-y-3 bg-slate-50"></div>
-                </details>
+                <div class="bg-slate-800 p-6 flex justify-between items-center text-white">
+                    <div>
+                        <span class="text-[10px] font-bold text-slate-400 uppercase block mb-1">Resultado del Mes</span>
+                        <span id="res-flujo" class="text-2xl font-black">$0.00</span>
+                    </div>
+                    <i class="fas fa-wallet text-slate-600 text-3xl"></i>
+                </div>
+                <div id="lista-categorias" class="p-4 space-y-4 bg-slate-50"></div>
             </div>
         </div>
 
         <div id="tab-registro" class="tab-content">
-            <div class="bg-white p-8 rounded-3xl border shadow-xl max-w-lg mx-auto">
-                <h2 class="text-center font-black text-slate-800 uppercase mb-6">Nuevo Registro</h2>
-                <form id="form-mov" class="space-y-4">
+            <div class="bg-white p-8 rounded-[2.5rem] border shadow-xl max-w-xl mx-auto">
+                <h2 class="text-xl font-black text-slate-800 text-center uppercase mb-8">Nuevo Movimiento</h2>
+                <form id="form-registro" class="space-y-6">
                     <div class="grid grid-cols-2 gap-4">
-                        <input type="date" id="f-fecha" class="p-4 bg-slate-50 border rounded-2xl outline-none font-bold text-sm" required>
-                        <input type="number" id="f-monto" step="0.01" class="p-4 bg-slate-50 border rounded-2xl outline-none font-black text-indigo-600 text-lg" placeholder="0.00" required>
+                        <div class="space-y-2">
+                            <label class="text-[10px] font-bold text-slate-400 uppercase ml-2">Fecha</label>
+                            <input type="date" id="r-fecha" class="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl font-bold outline-none focus:border-indigo-500 transition" required>
+                        </div>
+                        <div class="space-y-2">
+                            <label class="text-[10px] font-bold text-slate-400 uppercase ml-2">Monto ($)</label>
+                            <input type="number" id="r-monto" step="0.01" class="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl font-black text-indigo-600 text-xl outline-none focus:border-indigo-500 transition" placeholder="0.00" required>
+                        </div>
                     </div>
-                    <select id="f-cat" class="w-full p-4 bg-slate-50 border rounded-2xl outline-none font-bold text-xs" required></select>
-                    <input type="text" id="f-nota" class="w-full p-4 bg-slate-50 border rounded-2xl outline-none text-sm" placeholder="Comentario opcional">
-                    <button type="submit" class="w-full bg-slate-900 text-white py-5 rounded-2xl font-black uppercase text-xs tracking-widest hover:bg-indigo-600 transition">Guardar Movimiento</button>
+                    <div class="space-y-2">
+                        <label class="text-[10px] font-bold text-slate-400 uppercase ml-2">Seleccionar Categoría</label>
+                        <select id="r-cat" class="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl font-bold text-slate-700 outline-none focus:border-indigo-500 transition appearance-none" required></select>
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-[10px] font-bold text-slate-400 uppercase ml-2">Nota o Concepto</label>
+                        <input type="text" id="r-nota" class="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl outline-none focus:border-indigo-500 transition" placeholder="Ej: Pago de tarjeta de crédito">
+                    </div>
+                    <button type="submit" class="w-full bg-indigo-600 text-white py-5 rounded-2xl font-black uppercase text-xs tracking-[0.2em] shadow-lg hover:bg-slate-900 transition active:scale-95">Registrar Operación</button>
                 </form>
             </div>
         </div>
 
-        <div id="tab-activos" class="tab-content space-y-4">
-            <div id="grid-act" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
-            <button onclick="addActivo()" class="w-full bg-slate-900 text-white p-5 rounded-2xl font-black text-xs uppercase shadow-lg">+ Nuevo Activo Fijo</button>
+        <div id="tab-activos" class="tab-content space-y-6">
+            <div id="grid-activos" class="grid grid-cols-1 sm:grid-cols-2 gap-4"></div>
+            <button onclick="nuevoItemActivo()" class="w-full bg-slate-900 text-white p-5 rounded-2xl font-black text-xs uppercase shadow-xl hover:bg-indigo-600 transition">+ Añadir Nuevo Activo / Pasivo</button>
         </div>
 
         <div id="tab-historial" class="tab-content">
-            <div class="bg-white rounded-3xl border shadow-sm overflow-hidden">
-                <div id="lista-hist" class="divide-y divide-slate-100"></div>
+            <div class="bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-sm">
+                <div id="lista-historial" class="divide-y divide-slate-100"></div>
             </div>
         </div>
 
     </main>
 
-    <div id="modal-box" class="fixed inset-0 bg-slate-900/90 z-[100] hidden flex items-center justify-center p-4">
-        <div class="bg-white w-full max-w-md rounded-3xl overflow-hidden shadow-2xl">
-            <div class="p-6 border-b flex justify-between items-center bg-slate-50">
-                <h3 id="modal-title" class="font-black text-xs uppercase text-slate-400">Desglose</h3>
-                <button onclick="cerrarModal()" class="text-slate-300 hover:text-red-500"><i class="fas fa-times-circle text-2xl"></i></button>
+    <div id="modal-detalle" class="fixed inset-0 bg-slate-900/90 z-[100] hidden flex items-center justify-center p-4">
+        <div class="bg-white w-full max-w-md rounded-[2.5rem] overflow-hidden shadow-2xl scale-in">
+            <div class="p-8 border-b flex justify-between items-center bg-slate-50">
+                <h3 id="modal-title" class="font-black text-xs uppercase text-slate-500 tracking-widest">Desglose</h3>
+                <button onclick="cerrarModal()" class="text-slate-300 hover:text-red-500 transition"><i class="fas fa-times-circle text-3xl"></i></button>
             </div>
-            <div id="modal-content" class="p-6 max-h-[60vh] overflow-y-auto space-y-3"></div>
+            <div id="modal-content" class="p-8 max-h-[55vh] overflow-y-auto space-y-4"></div>
         </div>
     </div>
 
     <script>
-        // ESTRUCTURA COMPLETA BASADA EN TU DOCUMENTO [cite: 5-106]
+        // ESTRUCTURA COMPLETA SEGÚN WORD/EXCEL
         const ESTRUCTURA = {
             "INGRESOS": {
-                "PRINCIPAL": ["INGRESOS MENSUALES ADULTO 1", "INGRESOS MENSUALES ADULTO 2", "BONOS/REGALOS", "INGRESOS POR VENTAS"]
+                "INGRESOS ADULTOS": ["INGRESOS MENSUALES ADULTO 1", "INGRESOS MENSUALES ADULTO 2"],
+                "INGRESOS EXTRAS": ["BONOS/REGALOS", "INGRESOS POR VENTAS"]
             },
             "GASTOS": {
+                "AHORROS": ["FONDOS DE AHORRO", "INVERSIONES"],
                 "GASTOS DEL INMUEBLE 1": ["HIPOTECA", "IMPUESTOS", "ADMINISTRACIÓN", "MANTENIMIENTO", "OTROS"],
                 "GASTOS DEL INMUEBLE 2": ["HIPOTECA", "IMPUESTOS", "ADMINISTRACIÓN", "MANTENIMIENTO", "OTROS"],
                 "SERVICIOS": ["ELECTRICIDAD", "AGUA", "GAS", "TELEFONOS", "APP O SUSCRIPCIONES", "INTERNET / TV", "OTROS"],
                 "ALIMENTACIÓN": ["MERCADOS", "RESTAURANTES", "GASTOS DIARIOS CAFÉ/MERIENDA", "CIGARRILLOS", "OTROS"],
                 "TRANSPORTE": ["BUSES/TRENES", "CUOTA AUTOMÓVIL 1", "CUOTA AUTOMÓVIL 2", "GASOLINA", "PEAJES", "IMPUESTOS", "MANTENIMIENTO", "SEGUROS", "PARQUEADORES", "OTROS"],
                 "HIJOS": ["COLEGIOS", "MATRÍCULAS ESCOLARES", "ACTIVIDADES EXTRA", "MESADA", "ÚTILES ESCOLARES", "REGALOS Y FIESTAS", "CLASES EXTRA", "TERAPIAS/OTROS", "AYUDA DOMÉSTICA", "TRANSPORTE ESCOLAR", "VIAJES ESCOLARES", "CUOTA ALIMENTARIA (SI APLICA)", "OTROS"],
-                "EDUCACIÓN ADULTOS": ["GENERAL"],
+                "EDUCACIÓN ADULTOS": ["CURSOS", "POSGRADOS", "LIBROS", "OTROS"],
                 "SALUD": ["SEGURO MÉDICO", "DENTISTA", "MEDICINAS", "PAGOS NO CUBIERTOS POR SEGURO", "OTROS"],
                 "MASCOTAS": ["SEGURO", "COMIDA", "CUIDADOS", "OTROS"],
                 "VESTUARIO": ["UNIFORMES HIJOS", "ROPA HIJOS", "ROPA ADULTOS", "IMPLEMENTOS DEPORTIVOS", "SALÓN DE BELLEZA", "PELUQUERÍA", "COSMÉTICOS", "OTROS"],
                 "OTROS GASTOS": ["REGALOS", "FIESTAS Y CELEBRACIONES", "VACACIONES", "SALIDAS FIN DE SEMANA", "AYUDA A PARIENTES", "DONACIONES", "HOBBIES/PASATIEMPOS", "GASTOS MISCELÁNEOS"],
-                "OTROS SEGUROS": ["SEGURO MÉDICO", "SEGURO DENTÍSTA", "SEGURO DE VIDA", "SEGURO MORTUORIO", "OTROS SEGUROS"],
+                "OTROS SEGUROS": ["SEGURO MÉDICO", "SEGURO DENTÍSTA", "SEGURO DE VIDA", "SEGURO MORTUORIO", "OTROS"],
                 "DEUDAS": ["TARJETA DE CRÉDITO 1", "TARJETA DE CRÉDITO 2", "TARJETA DE CRÉDITO 3", "OTRA DEUDA 1", "OTRA DEUDA 2", "DEUDAS FAMILIARES", "DEUDA CON LA EMPRESA", "CRÉDITO DE EDUCACIÓN"]
             }
         };
 
-        let db = JSON.parse(localStorage.getItem('elite_db_v13')) || {
+        let db = JSON.parse(localStorage.getItem('elite_v14_data')) || {
             movs: [],
             activos: [
-                { n: "INMUEBLE 1", v: 0, d: 0 },
-                { n: "INMUEBLE 2", v: 0, d: 0 },
-                { n: "AUTO 1", v: 0, d: 0 }
+                { id: 1, n: "INMUEBLE 1", v: 0, d: 0 },
+                { id: 2, n: "AUTOMÓVIL 1", v: 0, d: 0 },
+                { id: 3, n: "TARJETA DE CRÉDITO 1", v: 0, d: 0 }
             ]
         };
 
-        let myCharts = {};
+        let charts = {};
 
-        function irTab(id, btn) {
+        // NAVEGACIÓN
+        function irA(id, btn) {
             document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.nav-btn').forEach(b => {
-                b.classList.remove('active-nav');
-                b.classList.add('text-slate-400');
-            });
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active-nav'));
             document.getElementById(id).classList.add('active');
             btn.classList.add('active-nav');
-            btn.classList.remove('text-slate-400');
             actualizar();
         }
 
+        // MOTOR DE ACTUALIZACIÓN
         function actualizar() {
-            let tIng = 0, tGas = 0, tVal = 0, tDeu = 0;
-            const dataI = {}, dataG = {};
+            let tI = 0, tG = 0, tV = 0, tD = 0;
+            const di = {}, dg = {};
 
             db.movs.forEach(m => {
-                const [p, s, sub] = m.path.split('|');
-                if(p === "INGRESOS") { tIng += m.val; dataI[s] = (dataI[s] || 0) + m.val; }
-                else { tGas += m.val; dataG[s] = (dataG[s] || 0) + m.val; }
+                const [p, s] = m.path.split('|');
+                if(p === "INGRESOS") { tI += m.val; di[s] = (di[s] || 0) + m.val; }
+                else { tG += m.val; dg[s] = (dg[s] || 0) + m.val; }
             });
-            db.activos.forEach(a => { tVal += a.v; tDeu += a.d; });
+            db.activos.forEach(a => { tV += a.v; tD += a.d; });
 
-            // Dashboard
-            const flujo = tIng - tGas;
-            document.getElementById('kpi-patrimonio').innerText = `$${(tVal - tDeu + flujo).toLocaleString()}`;
-            document.getElementById('kpi-deuda').innerText = `$${tDeu.toLocaleString()}`;
-            document.getElementById('kpi-flujo').innerText = `$${flujo.toLocaleString()}`;
-            document.getElementById('kpi-flujo').className = flujo >= 0 ? 'font-black text-xl text-emerald-400' : 'font-black text-xl text-red-400';
+            const flujo = tI - tG;
+            document.getElementById('top-patrimonio').innerText = `$${(tV - tD + flujo).toLocaleString()}`;
+            document.getElementById('top-deuda').innerText = `$${tD.toLocaleString()}`;
+            document.getElementById('res-flujo').innerText = `$${flujo.toLocaleString()}`;
+            document.getElementById('res-flujo').className = flujo >= 0 ? 'text-2xl font-black text-emerald-400' : 'text-2xl font-black text-red-400';
 
-            // Gráficos
-            renderCharts(dataI, dataG);
+            renderCharts(di, dg);
+            renderEstructuraFlujo();
+            renderActivos();
+            renderHistorial();
+            cargarSelect();
+        }
 
-            // Flujo Lista
-            const flowCont = document.getElementById('contenedor-flujo');
-            flowCont.innerHTML = '';
+        function renderEstructuraFlujo() {
+            const cont = document.getElementById('lista-categorias');
+            cont.innerHTML = '';
             for(let p in ESTRUCTURA) {
-                const totalP = db.movs.filter(m => m.path.startsWith(p)).reduce((a,b) => a+b.val, 0);
-                let html = `<div class="cat-principal-estilo p-3 rounded-lg mb-2 shadow-sm">${p} - Total: $${totalP.toLocaleString()}</div>`;
+                const sumP = db.movs.filter(m => m.path.startsWith(p)).reduce((a, b) => a + b.val, 0);
+                let html = `<div class="cat-principal-estilo mb-4 shadow-sm">${p}: $${sumP.toLocaleString()}</div>`;
                 for(let s in ESTRUCTURA[p]) {
-                    const totalS = db.movs.filter(m => m.path.includes(`|${s}|`)).reduce((a,b) => a+b.val, 0);
+                    const sumS = db.movs.filter(m => m.path.includes(`|${s}|`)).reduce((a, b) => a + b.val, 0);
                     html += `
-                    <details class="ml-2 mb-2 bg-white rounded-xl border overflow-hidden">
-                        <summary class="cat-secundaria-estilo p-3 flex justify-between cursor-pointer hover:bg-slate-50">
+                    <details class="ml-2 mb-3 bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
+                        <summary class="cat-secundaria-estilo p-4 flex justify-between cursor-pointer hover:bg-slate-50 transition">
                             <span>${s}</span>
-                            <span class="font-black">$${totalS.toLocaleString()}</span>
+                            <span class="font-black">$${sumS.toLocaleString()}</span>
                         </summary>
-                        <div class="p-3 bg-slate-50/50 space-y-2">
+                        <div class="p-4 bg-slate-50/50 space-y-2 border-t border-slate-100">
                             ${ESTRUCTURA[p][s].map(sub => {
-                                const totalSub = db.movs.filter(m => m.path.endsWith(`|${sub}`)).reduce((a,b) => a+b.val, 0);
+                                const sumSub = db.movs.filter(m => m.path.endsWith(`|${sub}`)).reduce((a, b) => a + b.val, 0);
                                 return `<div class="sub-categoria-estilo flex justify-between border-b border-white pb-1">
-                                    <span>${sub}</span><span>$${totalSub.toLocaleString()}</span>
+                                    <span>${sub}</span><span class="font-bold text-slate-700">$${sumSub.toLocaleString()}</span>
                                 </div>`;
                             }).join('')}
                         </div>
                     </details>`;
                 }
-                flowCont.innerHTML += html;
+                cont.innerHTML += html;
+            }
+        }
+
+        function renderActivos() {
+            document.getElementById('grid-activos').innerHTML = db.activos.map((a, i) => `
+                <div class="bg-white p-6 rounded-[2rem] border border-slate-200 shadow-sm relative overflow-hidden group">
+                    <button onclick="borrarAct(${i})" class="absolute top-4 right-4 text-slate-200 hover:text-red-500 transition opacity-0 group-hover:opacity-100"><i class="fas fa-trash-alt"></i></button>
+                    <p class="text-[9px] font-black text-slate-400 mb-4 uppercase tracking-[0.2em]">${a.n}</p>
+                    <div class="space-y-4">
+                        <div class="flex justify-between items-center text-xs font-bold">
+                            <span class="text-slate-500">VALOR ACTIVO</span>
+                            <input type="number" value="${a.v}" onchange="editAct(${i},'v',this.value)" class="w-24 text-right bg-slate-50 p-2 rounded-xl font-black outline-none focus:bg-white focus:ring-1 focus:ring-indigo-500">
+                        </div>
+                        <div class="flex justify-between items-center text-xs font-bold">
+                            <span class="text-red-400">DEUDA ACTUAL</span>
+                            <input type="number" value="${a.d}" onchange="editAct(${i},'d',this.value)" class="w-24 text-right bg-slate-50 p-2 rounded-xl font-black text-red-500 outline-none focus:bg-white focus:ring-1 focus:ring-red-500">
+                        </div>
+                        <div class="pt-4 border-t flex justify-between items-center">
+                            <button onclick="pagarDeuda(${i})" class="bg-emerald-500 text-white text-[10px] font-black px-3 py-2 rounded-lg hover:bg-emerald-600 transition ${a.d <= 0 ? 'hidden' : ''}">REGISTRAR ABONO</button>
+                            <div class="text-right">
+                                <p class="text-[8px] font-bold text-slate-400 uppercase">Equity Real</p>
+                                <p class="font-black text-indigo-600 text-lg">$${(a.v - a.d).toLocaleString()}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // FUNCIÓN DE PAGO DE DEUDA (LA OPCIÓN QUE SOLICITASTE)
+        function pagarDeuda(index) {
+            const monto = parseFloat(prompt(`¿Cuánto vas a abonar a la deuda de "${db.activos[index].n}"?`));
+            if(!monto || monto <= 0) return;
+
+            if(monto > db.activos[index].d) {
+                if(!confirm("El monto supera la deuda actual. ¿Deseas saldarla por completo?")) return;
             }
 
-            // Activos
-            document.getElementById('grid-act').innerHTML = db.activos.map((a, i) => `
-                <div class="bg-white p-6 rounded-3xl border shadow-sm">
-                    <p class="text-[9px] font-black text-slate-400 mb-4 uppercase tracking-widest">${a.n}</p>
-                    <div class="space-y-3">
-                        <div class="flex justify-between text-xs font-bold"><span>VALOR</span><input type="number" value="${a.v}" onchange="upAct(${i},'v',this.value)" class="w-24 text-right bg-slate-50 rounded p-1"></div>
-                        <div class="flex justify-between text-xs font-bold text-red-500"><span>DEUDA</span><input type="number" value="${a.d}" onchange="upAct(${i},'d',this.value)" class="w-24 text-right bg-slate-50 rounded p-1"></div>
-                        <div class="pt-2 border-t flex justify-between font-black"><span>NETO</span><span class="text-indigo-600">$${(a.v-a.d).toLocaleString()}</span></div>
-                    </div>
-                </div>`).join('');
+            // 1. Reducir deuda del activo
+            const abonoReal = Math.min(monto, db.activos[index].d);
+            db.activos[index].d -= abonoReal;
 
-            // Historial
-            document.getElementById('lista-hist').innerHTML = db.movs.slice(0, 30).map((m, i) => `
-                <div class="p-4 flex justify-between items-center">
-                    <div>
-                        <p class="text-[9px] font-bold text-slate-400 uppercase">${m.fecha}</p>
-                        <p class="font-bold text-xs">${m.path.split('|')[2]}</p>
+            // 2. Registrar movimiento en historial para el flujo de caja
+            db.movs.unshift({
+                fecha: new Date().toISOString().split('T')[0],
+                val: monto,
+                path: `GASTOS|DEUDAS|PAGO A ${db.activos[index].n}`,
+                nota: `Abono directo realizado desde pestaña Activos.`
+            });
+
+            save();
+            alert("Abono registrado con éxito.");
+        }
+
+        function renderHistorial() {
+            document.getElementById('lista-historial').innerHTML = db.movs.length ? db.movs.slice(0, 40).map((m, i) => `
+                <div class="p-5 flex justify-between items-center bg-white hover:bg-slate-50 transition">
+                    <div class="flex items-center gap-4">
+                        <div class="w-10 h-10 rounded-2xl flex items-center justify-center text-xs ${m.path.startsWith('ING') ? 'bg-emerald-100 text-emerald-600' : 'bg-red-100 text-red-600'}">
+                            <i class="fas ${m.path.startsWith('ING') ? 'fa-arrow-up' : 'fa-arrow-down'}"></i>
+                        </div>
+                        <div>
+                            <p class="text-[10px] font-bold text-slate-400 uppercase">${m.fecha}</p>
+                            <p class="font-black text-xs text-slate-800">${m.path.split('|')[2] || m.path.split('|')[1]}</p>
+                            <p class="text-[10px] text-slate-400 italic truncate w-32">${m.nota || '-'}</p>
+                        </div>
                     </div>
                     <div class="text-right">
-                        <p class="font-black text-sm ${m.path.startsWith('ING') ? 'text-emerald-500' : 'text-red-500'}">$${m.val.toLocaleString()}</p>
-                        <button onclick="delMov(${i})" class="text-[8px] font-bold text-slate-300 hover:text-red-500 uppercase">Eliminar</button>
+                        <p class="font-black text-sm ${m.path.startsWith('ING') ? 'text-emerald-600' : 'text-red-600'}">$${m.val.toLocaleString()}</p>
+                        <button onclick="borrarMov(${i})" class="text-[9px] font-bold text-slate-300 hover:text-red-500 uppercase">Eliminar</button>
                     </div>
-                </div>`).join('');
+                </div>
+            `).join('') : '<p class="p-10 text-center text-slate-400 text-xs italic">Sin movimientos registrados.</p>';
+        }
 
-            // Select Registro
-            const sel = document.getElementById('f-cat');
-            if(sel.innerHTML === "") {
-                for(let p in ESTRUCTURA) {
-                    for(let s in ESTRUCTURA[p]) {
-                        ESTRUCTURA[p][s].forEach(sub => {
-                            let o = document.createElement('option');
-                            o.value = `${p}|${s}|${sub}`;
-                            o.textContent = `${p} > ${s} > ${sub}`;
-                            sel.appendChild(o);
-                        });
-                    }
+        function renderCharts(di, dg) {
+            const opt = { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, cutout: '80%' };
+            if(charts.i) charts.i.destroy();
+            if(charts.g) charts.g.destroy();
+            charts.i = new Chart(document.getElementById('c-ing'), { type: 'doughnut', data: { labels: Object.keys(di), datasets: [{ data: Object.values(di), backgroundColor: ['#4f46e5','#818cf8','#a5b4fc'] }] }, options: opt });
+            charts.g = new Chart(document.getElementById('c-gas'), { type: 'doughnut', data: { labels: Object.keys(dg), datasets: [{ data: Object.values(dg), backgroundColor: ['#ef4444','#fb7185','#fbbf24','#4f46e5','#818cf8'] }] }, options: opt });
+        }
+
+        // ACCIONES DE FORMULARIO
+        document.getElementById('form-registro').onsubmit = (e) => {
+            e.preventDefault();
+            const val = parseFloat(document.getElementById('r-monto').value);
+            const path = document.getElementById('r-cat').value;
+            
+            db.movs.unshift({
+                fecha: document.getElementById('r-fecha').value,
+                val: val,
+                path: path,
+                nota: document.getElementById('r-nota').value
+            });
+
+            // Si el gasto es en la categoría "DEUDAS", preguntar si descontar de un activo
+            if(path.includes("DEUDAS") || path.includes("HIPOTECA")) {
+                const target = prompt("¿Deseas descontar este pago de la deuda de algún Activo? Escribe el nombre exacto del Activo (Ej: INMUEBLE 1) o deja en blanco para ignorar:");
+                if(target) {
+                    const idx = db.activos.findIndex(a => a.n.toUpperCase() === target.toUpperCase());
+                    if(idx !== -1) db.activos[idx].d = Math.max(0, db.activos[idx].d - val);
+                }
+            }
+
+            save();
+            document.getElementById('form-registro').reset();
+            setHoy();
+            irA('tab-resumen', document.querySelector('.nav-btn'));
+        };
+
+        function editAct(i, p, v) { db.activos[i][p] = parseFloat(v) || 0; save(); }
+        function nuevoItemActivo() { 
+            const n = prompt("Nombre del Activo o Pasivo:"); 
+            if(n) { db.activos.push({id: Date.now(), n: n.toUpperCase(), v: 0, d: 0}); save(); } 
+        }
+        function borrarAct(i) { if(confirm("¿Eliminar este ítem de tu patrimonio?")) { db.activos.splice(i, 1); save(); } }
+        function borrarMov(i) { if(confirm("¿Eliminar registro del historial?")) { db.movs.splice(i, 1); save(); } }
+        
+        function verDetalle(tipo) {
+            const m = document.getElementById('modal-detalle');
+            m.classList.remove('hidden');
+            const cont = document.getElementById('modal-content');
+            cont.innerHTML = '';
+            
+            if(tipo === 'patrimonio') {
+                document.getElementById('modal-title').innerText = "Análisis de Patrimonio";
+                db.activos.forEach(a => {
+                    cont.innerHTML += `<div class="flex justify-between p-4 bg-slate-50 rounded-2xl border border-slate-100"><span class="text-xs font-bold text-slate-500">${a.n}</span><span class="font-black text-indigo-600">$${(a.v - a.d).toLocaleString()}</span></div>`;
+                });
+            } else {
+                document.getElementById('modal-title').innerText = "Estado de Deudas";
+                db.activos.filter(a => a.d > 0).forEach(a => {
+                    cont.innerHTML += `<div class="flex justify-between p-4 bg-red-50 rounded-2xl border border-red-100"><span class="text-xs font-bold text-red-800">${a.n}</span><span class="font-black text-red-600">$${a.d.toLocaleString()}</span></div>`;
+                });
+            }
+        }
+
+        function cargarSelect() {
+            const s = document.getElementById('r-cat');
+            if(s.innerHTML !== "") return;
+            for(let p in ESTRUCTURA) {
+                for(let sec in ESTRUCTURA[p]) {
+                    ESTRUCTURA[p][sec].forEach(sub => {
+                        let o = document.createElement('option');
+                        o.value = `${p}|${sec}|${sub}`;
+                        o.textContent = `${p} > ${sec} > ${sub}`;
+                        s.appendChild(o);
+                    });
                 }
             }
         }
 
-        function renderCharts(di, dg) {
-            const opt = { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, cutout: '75%' };
-            if(myCharts.i) myCharts.i.destroy();
-            if(myCharts.g) myCharts.g.destroy();
-            myCharts.i = new Chart(document.getElementById('chartIng'), { type: 'doughnut', data: { labels: Object.keys(di), datasets: [{ data: Object.values(di), backgroundColor: ['#4f46e5','#818cf8','#a5b4fc'] }] }, options: opt });
-            myCharts.g = new Chart(document.getElementById('chartGas'), { type: 'doughnut', data: { labels: Object.keys(dg), datasets: [{ data: Object.values(dg), backgroundColor: ['#ef4444','#f87171','#fb923c','#fbbf24','#fcd34d','#4f46e5','#818cf8'] }] }, options: opt });
-        }
-
-        document.getElementById('form-mov').onsubmit = (e) => {
-            e.preventDefault();
-            db.movs.unshift({
-                fecha: document.getElementById('f-fecha').value,
-                val: parseFloat(document.getElementById('f-monto').value),
-                path: document.getElementById('f-cat').value,
-                nota: document.getElementById('f-nota').value
-            });
-            save();
-            document.getElementById('form-mov').reset();
-            setHoy();
-            irTab('tab-resumen', document.querySelector('.nav-btn'));
-        };
-
-        function upAct(i, p, v) { db.activos[i][p] = parseFloat(v) || 0; save(); }
-        function addActivo() { const n = prompt("Nombre:"); if(n) { db.activos.push({n: n.toUpperCase(), v: 0, d: 0}); save(); } }
-        function delMov(i) { if(confirm("¿Borrar?")) { db.movs.splice(i, 1); save(); } }
-        function save() { localStorage.setItem('elite_db_v13', JSON.stringify(db)); actualizar(); }
-        function setHoy() { document.getElementById('f-fecha').valueAsDate = new Date(); }
-        function borrarBD() { if(confirm("¿Resetear?")) { localStorage.clear(); location.reload(); } }
-
-        function abrirDrillDown(tipo) {
-            document.getElementById('modal-box').classList.remove('hidden');
-            const cont = document.getElementById('modal-content');
-            cont.innerHTML = '';
-            if(tipo === 'patrimonio') {
-                document.getElementById('modal-title').innerText = "Desglose Activos";
-                db.activos.forEach(a => cont.innerHTML += `<div class="flex justify-between border-b pb-2 text-sm font-bold"><span>${a.n}</span><span class="text-indigo-600">$${(a.v-a.d).toLocaleString()}</span></div>`);
-            } else {
-                document.getElementById('modal-title').innerText = "Desglose Deudas";
-                db.activos.filter(a => a.d > 0).forEach(a => cont.innerHTML += `<div class="flex justify-between border-b pb-2 text-sm font-bold"><span>${a.n}</span><span class="text-red-500">$${a.d.toLocaleString()}</span></div>`);
-            }
-        }
-
-        function cerrarModal() { document.getElementById('modal-box').classList.add('hidden'); }
+        function cerrarModal() { document.getElementById('modal-detalle').classList.add('hidden'); }
+        function save() { localStorage.setItem('elite_v14_data', JSON.stringify(db)); actualizar(); }
+        function setHoy() { document.getElementById('r-fecha').valueAsDate = new Date(); }
+        function borrarTodo() { if(confirm("ADVERTENCIA: ¿Deseas resetear todos los datos?")) { localStorage.clear(); location.reload(); } }
         
-        function exportarExcel() {
-            let csv = "\uFEFFFecha,Categoría,Subcategoría,Monto\n";
-            db.movs.forEach(m => { const p = m.path.split('|'); csv += `${m.fecha},${p[1]},${p[2]},${m.val}\n`; });
+        function exportarCSV() {
+            let csv = "\uFEFFFecha,Categoría,Monto,Nota\n";
+            db.movs.forEach(m => csv += `${m.fecha},${m.path},${m.val},"${m.nota}"\n`);
             const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
             const link = document.createElement('a');
             link.href = URL.createObjectURL(blob);
-            link.download = "Elite_Finance_Report.csv";
+            link.download = `Reporte_Elite_Finance.csv`;
             link.click();
         }
 
